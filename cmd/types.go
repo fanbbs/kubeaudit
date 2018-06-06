@@ -8,7 +8,7 @@ import (
 	extensionsv1beta1 "k8s.io/api/extensions/v1beta1"
 	networking "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
+	k8sRuntime "k8s.io/apimachinery/pkg/runtime"
 )
 
 type CronJob = batchv1beta1.CronJob
@@ -18,6 +18,7 @@ type Pod = apiv1.Pod
 type ReplicationController = apiv1.ReplicationController
 type SecurityContext = apiv1.SecurityContext
 type StatefulSet = v1beta1.StatefulSet
+type Resource k8sRuntime.Object
 
 type ObjectMeta = metav1.ObjectMeta
 type PodSpec = apiv1.PodSpec
@@ -41,14 +42,13 @@ type DeploymentExtensionsV1Beta1 = extensionsv1beta1.Deployment
 
 type Metadata = map[string]string
 
-func IsSupportedResourceType(obj runtime.Object) bool {
-	switch obj.(type) {
+func IsSupportedResourceType(resource Resource) bool {
+	switch resource.(type) {
 	case *CronJob, *DaemonSet, *NetworkPolicy, *Pod, *ReplicationController, *StatefulSet,
-	*DaemonSetList, *DeploymentList, *NamespaceList, *NetworkPolicyList, *PodList, *ReplicationControllerList,
-	*StatefulSetList, *DeploymentV1Beta1, *DeploymentV1Beta2, *DeploymentExtensionsV1Beta1:
+		*DaemonSetList, *DeploymentList, *NamespaceList, *NetworkPolicyList, *PodList, *ReplicationControllerList,
+		*StatefulSetList, *DeploymentV1Beta1, *DeploymentV1Beta2, *DeploymentExtensionsV1Beta1:
 		return true
 	default:
 		return false
 	}
 }
-

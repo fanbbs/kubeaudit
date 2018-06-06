@@ -6,7 +6,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
-	k8sRuntime "k8s.io/apimachinery/pkg/runtime"
 )
 
 type capsDropList struct {
@@ -103,7 +102,7 @@ func checkCapabilities(container Container, result *Result) {
 	}
 }
 
-func auditCapabilities(resource k8sRuntime.Object) (results []Result) {
+func auditCapabilities(resource Resource) (results []Result) {
 	for _, container := range getContainers(resource) {
 		result, err := newResultFromResource(resource)
 		if err != nil {
