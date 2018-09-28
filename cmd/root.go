@@ -43,6 +43,9 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(processFlags)
+	RootCmd.PersistentFlags().BoolVarP(&rootConfig.localMode, "local", "l", false, "[DEPRECATED] Local mode, uses $HOME/.kube/config as configuration")
+	RootCmd.Flags().MarkHidden("local")
+
 	RootCmd.PersistentFlags().StringVarP(&rootConfig.kubeConfig, "kubeconfig", "c", "", "Specify local config file (default is $HOME/.kube/config")
 	RootCmd.PersistentFlags().StringVarP(&rootConfig.verbose, "verbose", "v", "INFO", "Set the debug level")
 	RootCmd.PersistentFlags().BoolVarP(&rootConfig.json, "json", "j", false, "Enable json logging")
@@ -59,5 +62,11 @@ func processFlags() {
 	}
 	if rootConfig.json {
 		log.SetFormatter(&log.JSONFormatter{})
+	}
+
+	if rootConfig.localMode == true {
+		log.Warn("-l/-local is deprecated! kubeaudit will default to local checks if it's not running in a cluster. ")
+		log.Warn("To use a local kubeconfig file from inside a cluster specify '-c $HOME/.kube/config'.")
+		rootConfig.kubeConfig = os.Getenv("HOME") + "/.kube/config"
 	}
 }
