@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"reflect"
 	"runtime"
 	"strings"
@@ -34,6 +35,11 @@ func debugPrint() {
 		stacklen := runtime.Stack(buf, true)
 		log.Debugf("%s", buf[:stacklen])
 	}
+}
+
+func isInContainer() bool {
+	host, port := os.Getenv("KUBERNETES_SERVICE_HOST"), os.Getenv("KUBERNETES_SERVICE_PORT")
+	return len(host) != 0 && len(port) == 0
 }
 
 func isInRootConfigNamespace(meta metav1.ObjectMeta) (valid bool) {
@@ -223,7 +229,7 @@ func getResources() (resources []k8sRuntime.Object, err error) {
 	if rootConfig.manifest != "" {
 		resources, err = getKubeResourcesManifest(rootConfig.manifest)
 	} else {
-		if kube, err := kubeClient(rootConfig.kubeConfig); err == nil {
+		if kube, err := kubeClient(); err == nil {
 			resources = getKubeResources(kube)
 		}
 	}
