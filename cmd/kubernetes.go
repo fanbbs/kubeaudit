@@ -28,14 +28,6 @@ func kubeClientConfig() (*rest.Config, error) {
 }
 
 func kubeClient() (*kubernetes.Clientset, error) {
-	if rootConfig.verbose == "DEBUG" {
-		log.SetLevel(log.DebugLevel)
-		log.AddHook(NewDebugHook())
-	}
-	if rootConfig.json {
-		log.SetFormatter(&log.JSONFormatter{})
-	}
-
 	config, err := kubeClientConfig()
 	if err != nil {
 		log.Error(err)
