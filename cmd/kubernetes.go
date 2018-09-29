@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 
 	log "github.com/sirupsen/logrus"
 	networking "k8s.io/api/networking/v1"
@@ -14,17 +15,19 @@ import (
 )
 
 func kubeClientConfig() (*rest.Config, error) {
-	if rootConfig.kubeConfig == "" && !isInContainer() {
-		log.Info("Not running inside cluster, using local config")
-		rootConfig.kubeConfig = os.Getenv("HOME") + "/.kube/config"
-	}
-
 	if rootConfig.kubeConfig != "" {
 		return clientcmd.BuildConfigFromFlags("", rootConfig.kubeConfig)
 	}
 
-	log.Info("Running inside cluster, using the cluster config")
-	return rest.InClusterConfig()
+	if config, err := rest.InClusterConfig(); err == nil {
+		log.Info("Running inside cluster, using the cluster config")
+		return config, nil
+	}
+
+	log.Info("Not running inside cluster, using local config")
+	rootConfig.kubeConfig = filepath.Join(os.Getenv("HOME"), ".kube", "config")
+
+	return clientcmd.BuildConfigFromFlags("", rootConfig.kubeConfig)
 }
 
 func kubeClient() (*kubernetes.Clientset, error) {
