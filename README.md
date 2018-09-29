@@ -198,14 +198,14 @@ therefore should be dropped. `kubeaudit` will also complain about added capabili
 If the capabilities field doesn't exist within the security context:
 
 ```sh
-kubeaudiit caps
+kubeaudit caps
 ERRO[0000] Capabilities field not defined!
 ```
 
 When capabilities were added:
 
 ```sh
-kubeaudiit caps
+kubeaudit caps
 ERRO[0000] Capability added  CapName=NET_ADMIN
 ```
 
@@ -215,7 +215,7 @@ want to keep some of the capabilities otherwise `kubeaudit` will complain about
 them not being dropped:
 
 ```sh
-kubeaudiit caps
+kubeaudit caps
 ERRO[0000] Capability not dropped  CapName=AUDIT_WRITE
 ```
 
