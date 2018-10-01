@@ -27,10 +27,7 @@ type rootFlags struct {
 var RootCmd = &cobra.Command{
 	Use:   "kubeaudit",
 	Short: "A Kubernetes security auditor",
-	Long: `kubeaudit is a program that will help you audit
-your Kubernetes clusters. Specify -l to run kubeaudit using ~/.kube/config
-otherwise it will attempt to create an in-cluster client.
-
+	Long: `kubeaudit is a program that checks security settings on your Kubernetes clusters.
 #patcheswelcome`,
 }
 
