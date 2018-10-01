@@ -25,7 +25,11 @@ func kubeClientConfig() (*rest.Config, error) {
 	}
 
 	log.Info("Not running inside cluster, using local config")
-	rootConfig.kubeConfig = filepath.Join(os.Getenv("HOME"), ".kube", "config")
+	home, ok := os.LookupEnv("HOME")
+	if !ok {
+		log.Fatal("No config file specified and $HOME not found.")
+	}
+	rootConfig.kubeConfig = filepath.Join(home, ".kube", "config")
 
 	return clientcmd.BuildConfigFromFlags("", rootConfig.kubeConfig)
 }
