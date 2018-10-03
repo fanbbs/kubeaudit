@@ -31,7 +31,8 @@ var versionCmd = &cobra.Command{
 
 		kube, err := kubeClient()
 		if err != nil {
-			log.Fatal(err)
+			log.Warn("Could not get kubernetes server version.")
+			return
 		}
 		printKubernetesVersion(kube)
 	},

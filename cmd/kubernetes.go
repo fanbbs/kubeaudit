@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -16,7 +17,7 @@ import (
 
 func kubeClientConfig() (*rest.Config, error) {
 	if rootConfig.kubeConfig != "" {
-		return clientcmd.BuildConfigFromFlags("", rootConfig.kubeConfig)
+		return kubeClientConfigLocal()
 	}
 
 	if config, err := rest.InClusterConfig(); err == nil {
@@ -27,17 +28,24 @@ func kubeClientConfig() (*rest.Config, error) {
 	log.Info("Not running inside cluster, using local config")
 	home, ok := os.LookupEnv("HOME")
 	if !ok {
-		log.Fatal("No config file specified and $HOME not found.")
+		return nil, fmt.Errorf("no config file specified and $HOME not found")
 	}
-	rootConfig.kubeConfig = filepath.Join(home, ".kube", "config")
 
+	rootConfig.kubeConfig = filepath.Join(home, ".kube", "config")
+	return kubeClientConfigLocal()
+}
+
+func kubeClientConfigLocal() (*rest.Config, error) {
+	if _, err := os.Stat(rootConfig.kubeConfig); err != nil {
+		return nil, fmt.Errorf("unable to open kubeconfig file %s", rootConfig.kubeConfig)
+	}
 	return clientcmd.BuildConfigFromFlags("", rootConfig.kubeConfig)
 }
 
 func kubeClient() (*kubernetes.Clientset, error) {
 	config, err := kubeClientConfig()
 	if err != nil {
-		log.Error(err)
+		return nil, err
 	}
 	kube, err := kubernetes.NewForConfig(config)
 	return kube, err
