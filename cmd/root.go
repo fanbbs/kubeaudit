@@ -30,6 +30,7 @@ your Kubernetes clusters. Specify -l to run kubeaudit using ~/.kube/config
 otherwise it will attempt to create an in-cluster client.
 
 #patcheswelcome`,
+	Version: Version,
 }
 
 // Execute is a wrapper for the RootCmd.Execute method which will exit the program if there is an error.
