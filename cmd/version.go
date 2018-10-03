@@ -26,8 +26,7 @@ var versionCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		_, err := version.NewVersion(Version + "+" + Commit)
 		if err != nil {
-			log.Error(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 		log.WithFields(log.Fields{
 			"BuildDate": BuildDate,
@@ -42,8 +41,7 @@ var versionCmd = &cobra.Command{
 
 		kube, err := kubeClient(kubeconfig)
 		if err != nil {
-			log.Error(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 		printKubernetesVersion(kube)
 	},
