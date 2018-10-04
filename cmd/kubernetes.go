@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"errors"
 	"os"
 	"path/filepath"
 
@@ -14,6 +14,9 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
+
+// ErrNoReadableKubeConfig represents any error that prevents the client from opening a kubeconfig file.
+var ErrNoReadableKubeConfig = errors.New("unable to open kubeconfig file")
 
 func kubeClientConfig() (*rest.Config, error) {
 	if rootConfig.kubeConfig != "" {
@@ -28,7 +31,8 @@ func kubeClientConfig() (*rest.Config, error) {
 	log.Info("Not running inside cluster, using local config")
 	home, ok := os.LookupEnv("HOME")
 	if !ok {
-		return nil, fmt.Errorf("no config file specified and $HOME not found")
+		log.Error("Unable to load kubeconfig. No config file specified and $HOME not found.")
+		return nil, ErrNoReadableKubeConfig
 	}
 
 	rootConfig.kubeConfig = filepath.Join(home, ".kube", "config")
@@ -37,7 +41,8 @@ func kubeClientConfig() (*rest.Config, error) {
 
 func kubeClientConfigLocal() (*rest.Config, error) {
 	if _, err := os.Stat(rootConfig.kubeConfig); err != nil {
-		return nil, fmt.Errorf("unable to open kubeconfig file %s", rootConfig.kubeConfig)
+		log.Errorf("Unable to load kubeconfig. Could not open file %s.", rootConfig.kubeConfig)
+		return nil, ErrNoReadableKubeConfig
 	}
 	return clientcmd.BuildConfigFromFlags("", rootConfig.kubeConfig)
 }
